@@ -131,15 +131,17 @@ app.post('/singup', function(req, res) {
 app.post('/login', function(req, res) {
     res.set('Content-Type', 'application/json');
     checkDB(res);
-    // console.log(req.body);
-    db.collection('users').find({ 'password': req.body.password,'email': req.body.email }, function(error, records){
-      console.log(records.toArray());
-
-      if(error) {
-          console.log(records);
-        res.send('{"status":0,"message":"User already exist"}');
+    db.collection('users').find({ 'password': req.body.password,'email': req.body.email }).toArray(function(err, items) {
+      if(err) {
+        res.send('{"status":0,"message":"Server error"}');
       } else {
-        res.send('{"status":1, "message":"Singup success"}');
+        if (items.length) {
+          console.log('{"status":1, "message":"Login success", "data":'+items[0]+'}');
+            res.send('{"status":1, "message":"Login success", "data":'+JSON.stringify(items[0])+'}');
+        } else {
+            res.send('{"status":0,"message":"Email or passwor ot match."}');
+        }
+
       }
     });
 });
