@@ -11,8 +11,10 @@ Object.assign=require('object-assign')
 app.engine('html', require('ejs').renderFile);
 app.use(morgan('combined'));
 app.use(bodyParser.urlencoded({
-    extended: true
+    extended: false
 }));
+app.use(bodyParser.json());
+
 
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
@@ -118,14 +120,20 @@ app.get('/pagecount', function (req, res) {
 
 app.post('/singup', function(req, res) {
     res.set('Content-Type', 'application/json');
+    console.log(req.body.email);
     checkDB(res);
-    db.collection('users').insert(req.body, function(error, records){
-      if(error) {
-        res.send('{"status":0,"message":"User already exist"}');
-      } else {
-        res.send('{"status":1, "message":"Singup success"}');
-      }
-    });
+    if(req.body.email == ""  || req.body.email == nil || req.body.password == ""  || req.body.password == nil) {
+        res.send('{"status":0, "message":"params missing"}');
+    } else {
+      db.collection('users').insert(req.body, function(error, records){
+        if(error) {
+          res.send('{"status":0,"message":"User already exist"}');
+        } else {
+          res.send('{"status":1, "message":"Singup success"}');
+        }
+      });
+    }
+
 });
 
 app.post('/login', function(req, res) {
