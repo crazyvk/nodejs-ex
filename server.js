@@ -133,7 +133,31 @@ app.post('/singup', function(req, res) {
         }
       });
     }
+});
 
+app.post('/saveinfo', function(req, res) {
+    res.set('Content-Type', 'application/json');
+    console.log(req.body.email);
+    checkDB(res);
+      db.collection('info').insert(req.body, function(error, records){
+          res.send('{"status":1, "message":"User info saved."}');
+      });
+});
+
+app.post('/userinfo', function(req, res) {
+    res.set('Content-Type', 'application/json');
+    checkDB(res);
+    console.log(req.body);
+    console.log(req.body._id);
+    var ObjectId = require('mongodb').ObjectID;
+
+    db.collection('info').find({ '_id': new ObjectId(req.body._id)}).toArray(function(err, items) {
+      if(err) {
+        res.send('{"status":0,"message":"Server error"}');
+      } else {
+            res.send('{"status":1, "message":"User info.", "data":'+JSON.stringify(items)+'}');
+        }
+    });
 });
 
 app.post('/login', function(req, res) {
@@ -153,7 +177,6 @@ app.post('/login', function(req, res) {
       }
     });
 });
-
 
 // error handling
 app.use(function(err, req, res, next){
