@@ -89,18 +89,6 @@ console.log('xxxxxxxx');
     users: ["Will", "Laura"]
   });
 
-  // if (db) {
-  //   console.log('wwwwww');
-  //   var col = db.collection('counts');
-  //   // Create a document with request IP and current time of request
-  //   col.insert({ip: req.ip, date: Date.now()});
-  //   col.count(function(err, count){
-  //     res.render('index.html', { pageCountMessage : count, dbInfo: dbDetails });
-  //   });
-  // } else {
-  //   console.log('zzzzzz');
-  //   res.render('index.html', { pageCountMessage : null});
-  // }
 });
 
 app.get('/pagecount', function (req, res) {
@@ -137,10 +125,11 @@ app.post('/singup', function(req, res) {
 
 app.post('/saveinfo', function(req, res) {
     res.set('Content-Type', 'application/json');
-    console.log(req.body.email);
     checkDB(res);
-      db.collection('info').insert(req.body, function(error, records){
-          res.send('{"status":1, "message":"User info saved."}');
+      db.collection('info').insert(req.body, function(error, records) {
+        console.log('xxxxxxxx');
+        console.log(records);
+          res.send('{"status":1, "message":"User info saved.",  "data":"'+records.ops[0]._id+'"}');
       });
 });
 
@@ -155,8 +144,24 @@ app.post('/userinfo', function(req, res) {
       if(err) {
         res.send('{"status":0,"message":"Server error"}');
       } else {
-            res.send('{"status":1, "message":"User info.", "data":'+JSON.stringify(items)+'}');
-        }
+        res.send('{"status":1, "message":"User info.", "data":'+JSON.stringify(items)+'}');
+      }
+    });
+});
+
+app.post('/alluserinfo', function(req, res) {
+    res.set('Content-Type', 'application/json');
+    checkDB(res);
+    console.log(req.body);
+    console.log(req.body._id);
+    var ObjectId = require('mongodb').ObjectID;
+
+    db.collection('info').find({}).toArray(function(err, items) {
+      if(err) {
+        res.send('{"status":0,"message":"Server error"}');
+      } else {
+        res.send('{"status":1, "message":"User info.", "data":'+JSON.stringify(items)+'}');
+      }
     });
 });
 
